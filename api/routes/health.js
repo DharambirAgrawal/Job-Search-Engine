@@ -19,4 +19,14 @@ router.get('/', (req, res) => {
   res.status(200).json(health);
 });
 
+/**
+ * @route   GET /api/health/ping
+ * @desc    Simple ping endpoint for cron jobs
+ * @access  Public
+ */
+router.get('/ping', (req, res) => {
+  console.log(`[${new Date().toISOString()}] Received ping from external cron job`);
+  res.status(200).send('pong');
+});
+
 module.exports = router;

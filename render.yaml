@@ -3,7 +3,7 @@ services:
   - type: web
     name: job-search-engine
     env: node
-    buildCommand: npm install && npm run seed
+    buildCommand: npm install && ./scripts/setup-data.sh
     startCommand: npm run render-start
     envVars:
       - key: NODE_ENV
@@ -16,3 +16,17 @@ services:
         value: 14
     healthCheckPath: /api/health
     autoDeploy: true
+
+  # Cron job to keep the service awake
+  - type: cron
+    name: keep-alive-job
+    env: node
+    schedule: "*/10 * * * *"
+    buildCommand: npm install
+    startCommand: node scripts/render-keep-alive.js
+    envVars:
+      - key: APP_URL
+        fromService:
+          name: job-search-engine
+          type: web
+          envVarKey: APP_URL

@@ -162,7 +162,15 @@ The search service implements a simple inverted index:
 
 ### Deployment
 
-For deploying to Render, see the [Render Deployment Guide](./RENDER_DEPLOYMENT.md).
+For deploying to Render, we provide two options:
+
+1. **Automatic Deployment with Blueprint**:
+   ```bash
+   ./scripts/deploy-to-render.sh
+   ```
+
+2. **Manual Deployment**:
+   Follow the detailed instructions in the [Render Deployment Guide](./RENDER_DEPLOYMENT.md).
 
 ## �️ Web Interface
 
