@@ -1,6 +1,6 @@
 # Job Search Engine
 
-A backend-focused job matching system that demonstrates system design, algorithmic thinking, and software engineering skills. This project focuses on matching users to jobs based on skill similarity, providing search functionality, and modeling skill relationships using a graph.
+A job matching system that demonstrates system design, algorithmic thinking, and software engineering skills. This project focuses on matching users to jobs based on skill similarity, providing search functionality, and modeling skill relationships using a graph.
 
 ## 🎯 Features
 
@@ -9,11 +9,13 @@ A backend-focused job matching system that demonstrates system design, algorithm
 - **Skill Graph:** Models relationships between skills for recommendations and upskilling paths
 - **RESTful API:** Clean API endpoints for all functionality
 - **Modular Architecture:** Separation of concerns with well-defined services
+- **Simple UI Client:** Web interface for interacting with the system
 
 ## 🛠️ Tech Stack
 
 - **Backend:** Node.js with Express
 - **Database:** NeDB (File-based, MongoDB-compatible)
+- **Frontend:** HTML, CSS, and JavaScript
 - **Testing:** Jest
 
 ## 🏗️ Architecture
@@ -74,12 +76,12 @@ The system is built with a modular, service-oriented architecture:
 | GET    | `/api/jobs/:id`      | Get job by ID                   |
 | PUT    | `/api/jobs/:id`      | Update job                      |
 | DELETE | `/api/jobs/:id`      | Delete job                      |
-| GET    | `/api/match/:userId` | Return top job matches for user |
+| GET    | `/api/matcher/match/:userId` | Return top job matches for user |
 | GET    | `/api/search?q=term` | Keyword search jobs             |
 | GET    | `/api/skills`        | Get all skills in the system    |
 | GET    | `/api/skills/related/:skill` | Get related skills      |
 | POST   | `/api/skills/recommend` | Recommend skills based on current skills |
-| GET    | `/api/skills/path?from=X&to=Y` | Find path between skills |
+| POST   | `/api/skills/path` | Find path between skills |
 
 ## 🧪 Algorithms
 
@@ -143,17 +145,38 @@ The search service implements a simple inverted index:
    DB_TYPE=local
    ```
 
-4. Run the server
+4. Seed the database (optional)
    ```bash
-   npm run dev
+   node db/seed.js
    ```
 
-5. Run tests
+5. Run the server
    ```bash
-   npm test
+   node api/server.js
    ```
 
-## 📚 API Usage Examples
+6. Access the web interface
+   ```
+   Open http://localhost:3000 in your browser
+   ```
+
+## �️ Web Interface
+
+The application includes a simple web interface with the following sections:
+
+- **Users**: Add and manage user profiles with skills
+- **Jobs**: Add and manage job listings with required skills
+- **Match**: Find job matches for a specific user using different algorithms
+- **Search**: Search for jobs using keywords
+- **Skills**: Get skill recommendations and find skill paths
+
+The UI allows you to:
+- Perform all CRUD operations on users and jobs
+- View matches between users and jobs with match scores
+- Search for jobs based on keywords
+- Explore skill relationships and recommendations
+
+## �📚 API Usage Examples
 
 ### Add a User
 
@@ -196,3 +219,21 @@ curl http://localhost:3000/api/search?q=frontend
 - More comprehensive test coverage
 - Trie-based search autocomplete
 - ML-based skill extraction from job descriptions
+- Enhanced UI with reactive frameworks (React, Vue.js)
+- Authentication and user sessions
+- Job application tracking
+
+## 🖥️ Web Interface
+
+The application includes a simple web interface that allows you to:
+
+- Add and manage users with their skills
+- Add and manage job listings
+- Match users to jobs using different algorithms
+- Search for jobs by keywords
+- Get skill recommendations
+- Find paths between different skills
+
+To access the web interface, start the server and navigate to `http://localhost:3000` in your browser.
+
+![Job Search Engine UI](https://i.imgur.com/Pxy0Zfj.png)

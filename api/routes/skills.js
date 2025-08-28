@@ -19,6 +19,22 @@ router.get('/', (req, res) => {
 });
 
 /**
+ * @route   GET /api/skills/common
+ * @desc    Get most common skills in the graph
+ * @access  Public
+ */
+router.get('/common', (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const skills = skillGraphService.getCommonSkills(parseInt(limit));
+    res.json(skills);
+  } catch (error) {
+    console.error('Error getting common skills:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
  * @route   GET /api/skills/related/:skill
  * @desc    Get related skills for a given skill
  * @access  Public
@@ -66,29 +82,23 @@ router.post('/recommend', (req, res) => {
 });
 
 /**
- * @route   GET /api/skills/path
+ * @route   POST /api/skills/path
  * @desc    Find upskilling path between two skills
  * @access  Public
  */
-router.get('/path', (req, res) => {
+router.post('/path', (req, res) => {
   try {
-    const { from, to } = req.query;
+    const { fromSkill, toSkill } = req.body;
     
-    if (!from || !to) {
+    if (!fromSkill || !toSkill) {
       return res.status(400).json({ 
-        message: 'Both "from" and "to" query parameters are required' 
+        message: 'Both "fromSkill" and "toSkill" are required' 
       });
     }
     
-    const path = skillGraphService.findUpskillingPath(from, to);
+    const path = skillGraphService.findUpskillingPath(fromSkill, toSkill);
     
-    if (!path) {
-      return res.status(404).json({ 
-        message: 'No path found between these skills' 
-      });
-    }
-    
-    res.json(path);
+    res.json({ path: path || [] });
   } catch (error) {
     console.error('Error finding skill path:', error);
     res.status(500).json({ message: 'Server error' });

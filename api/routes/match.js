@@ -4,11 +4,11 @@ const matcherService = require('../../services/matcher');
 const router = express.Router();
 
 /**
- * @route   GET /api/match/:userId
+ * @route   GET /api/matcher/match/:userId
  * @desc    Get job matches for a user
  * @access  Public
  */
-router.get('/:userId', async (req, res) => {
+router.get('/match/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const { limit = 10, algorithm = 'jaccard' } = req.query;

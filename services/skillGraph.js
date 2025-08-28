@@ -115,6 +115,27 @@ class SkillGraphService {
   }
   
   /**
+   * Get the most common skills in the graph (skills with most connections)
+   * 
+   * @param {Number} limit - Maximum number of skills to return
+   * @returns {Array} - Array of common skill names
+   */
+  getCommonSkills(limit = 10) {
+    // Count connections for each skill
+    const skillConnections = {};
+    
+    Object.entries(this.skillGraph).forEach(([skill, connections]) => {
+      skillConnections[skill] = connections.length;
+    });
+    
+    // Sort by number of connections and return top skills
+    return Object.entries(skillConnections)
+      .sort(([, countA], [, countB]) => countB - countA)
+      .slice(0, limit)
+      .map(([skill]) => skill);
+  }
+  
+  /**
    * Get related skills for a given skill
    * 
    * @param {String} skill - Skill to find related skills for
@@ -139,19 +160,24 @@ class SkillGraphService {
    * @returns {Array|null} - Path of skills or null if no path exists
    */
   findUpskillingPath(currentSkill, targetSkill) {
-    if (!this.skillGraph[currentSkill] || !this.skillGraph[targetSkill]) {
+    // Case-insensitive matching - find actual skill names in our graph
+    const normalizedCurrentSkill = this._findSkillCaseInsensitive(currentSkill);
+    const normalizedTargetSkill = this._findSkillCaseInsensitive(targetSkill);
+    
+    // If skills don't exist in our graph, return null
+    if (!normalizedCurrentSkill || !normalizedTargetSkill) {
       return null;
     }
     
     // Use BFS to find shortest path
-    const queue = [{ skill: currentSkill, path: [currentSkill] }];
-    const visited = new Set([currentSkill]);
+    const queue = [{ skill: normalizedCurrentSkill, path: [normalizedCurrentSkill] }];
+    const visited = new Set([normalizedCurrentSkill]);
     
     while (queue.length > 0) {
       const { skill, path } = queue.shift();
       
       // Check if we've reached the target
-      if (skill === targetSkill) {
+      if (skill === normalizedTargetSkill) {
         return path;
       }
       
@@ -176,17 +202,22 @@ class SkillGraphService {
    * 
    * @param {Array} userSkills - Array of user's current skills
    * @param {Number} limit - Maximum number of recommendations
-   * @returns {Array} - Array of recommended skills with scores
+   * @returns {Array} - Array of recommended skills
    */
   recommendSkills(userSkills, limit = 5) {
+    // Normalize user skills to match our graph (case-insensitive)
+    const normalizedUserSkills = userSkills.map(skill => 
+      this._findSkillCaseInsensitive(skill)
+    ).filter(Boolean); // Filter out any null values (skills not found)
+    
     const recommendations = {};
     
     // Collect all related skills with their relationship scores
-    userSkills.forEach(skill => {
+    normalizedUserSkills.forEach(skill => {
       if (this.skillGraph[skill]) {
         this.skillGraph[skill].forEach(relation => {
           // Skip skills the user already has
-          if (userSkills.includes(relation.skill)) {
+          if (normalizedUserSkills.includes(relation.skill)) {
             return;
           }
           
@@ -204,11 +235,34 @@ class SkillGraphService {
     return Object.entries(recommendations)
       .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
       .slice(0, limit)
-      .map(([skill, score]) => ({
-        skill,
-        score,
-        metadata: this.skillMetadata[skill] || {}
-      }));
+      .map(([skill]) => skill);
+  }
+  
+  /**
+   * Helper method to find a skill in the graph regardless of case
+   * 
+   * @param {String} skillToFind - The skill name to search for
+   * @returns {String|null} - The actual skill name as stored in the graph, or null if not found
+   */
+  _findSkillCaseInsensitive(skillToFind) {
+    if (!skillToFind) return null;
+    
+    // If exact match exists, return it
+    if (this.skillGraph[skillToFind]) {
+      return skillToFind;
+    }
+    
+    // Otherwise, search case-insensitively
+    const normalizedSearchTerm = skillToFind.toLowerCase();
+    const allSkills = Object.keys(this.skillGraph);
+    
+    for (const skill of allSkills) {
+      if (skill.toLowerCase() === normalizedSearchTerm) {
+        return skill; // Return the properly cased version
+      }
+    }
+    
+    return null; // Skill not found
   }
 }
 
