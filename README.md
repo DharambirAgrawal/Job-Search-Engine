@@ -160,6 +160,10 @@ The search service implements a simple inverted index:
    Open http://localhost:3000 in your browser
    ```
 
+### Deployment
+
+For deploying to Render, see the [Render Deployment Guide](./RENDER_DEPLOYMENT.md).
+
 ## �️ Web Interface
 
 The application includes a simple web interface with the following sections:

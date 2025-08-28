@@ -1,0 +1,18 @@
+services:
+  # Web service
+  - type: web
+    name: job-search-engine
+    env: node
+    buildCommand: npm install && npm run seed
+    startCommand: npm run render-start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: APP_URL
+        sync: false # This will prompt for a value during deployment
+      - key: KEEP_ALIVE_INTERVAL
+        value: 14
+    healthCheckPath: /api/health
+    autoDeploy: true

@@ -13,7 +13,8 @@
     "seed": "node db/seed.js",
     "client": "node utils/client.js",
     "build": "echo 'No build step required'",
-    "keep-alive-test": "node test-keep-alive.js"
+    "keep-alive-test": "node test-keep-alive.js",
+    "render-start": "node api/server.js"
   },
   "keywords": [],
   "author": "",
