@@ -4,29 +4,11 @@ services:
     name: job-search-engine
     env: node
     buildCommand: npm install && ./scripts/setup-data.sh
-    startCommand: npm run render-start
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
-      - key: APP_URL
-        sync: false # This will prompt for a value during deployment
-      - key: KEEP_ALIVE_INTERVAL
-        value: 14
     healthCheckPath: /api/health
     autoDeploy: true
-
-  # Cron job to keep the service awake
-  - type: cron
-    name: keep-alive-job
-    env: node
-    schedule: "*/10 * * * *"
-    buildCommand: npm install
-    startCommand: node scripts/render-keep-alive.js
-    envVars:
-      - key: APP_URL
-        fromService:
-          name: job-search-engine
-          type: web
-          envVarKey: APP_URL
