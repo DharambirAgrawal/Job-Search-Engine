@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { api } from "../services/api";
+import Spinner from "./Spinner";
 import { useToast } from "./Toast";
 
 const Search = () => {
@@ -47,8 +48,14 @@ const Search = () => {
               required
             />
           </div>
-          <button type="submit" className="btn">
-            Search
+          <button type="submit" className="btn" disabled={loading} aria-busy={loading}>
+            {loading ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <Spinner size={16} /> Searching...
+              </span>
+            ) : (
+              "Search"
+            )}
           </button>
         </form>
       </div>

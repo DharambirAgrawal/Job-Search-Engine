@@ -1,11 +1,11 @@
 {"_id":"08e0c64e-3864-4d43-98c5-0f1966aa7f63","name":"Johnny","skills":["React","Docker"],"createdAt":{"$$date":1758559155019},"updatedAt":{"$$date":1758559155019}}
 {"_id":"374e7b26-f796-44d0-b553-1423d0581d6e","name":"djghdhjgh","skills":["React","Docker","Typescript"],"createdAt":{"$$date":1758559719888},"updatedAt":{"$$date":1758559732454}}
 {"_id":"37ecaa66-570d-4708-99d5-8ec4a638c0ae","name":"Bob Johnson","skills":["Python","Django","Flask","PostgreSQL","RESTful API"],"createdAt":{"$$date":1756364657871},"updatedAt":{"$$date":1756364657871}}
+{"_id":"58f8109b-25ca-4aa2-82b3-134ac3ff400f","name":"DbgUser","skills":["X"],"createdAt":{"$$date":1758559792781},"updatedAt":{"$$date":1758559792781}}
+{"_id":"6319f716-82ec-448a-bd43-ca33076b9e45","name":"DbgUser2-Edited","skills":["Y"],"createdAt":{"$$date":1758559792801},"updatedAt":{"$$date":1758559792814}}
 {"_id":"7b93f747-00aa-4539-8220-f3e98505fb8e","name":"Diana Ross","skills":["JavaScript","Angular","TypeScript","Node.js","Express"],"createdAt":{"$$date":1756364657871},"updatedAt":{"$$date":1756364657871}}
 {"_id":"8827f287-b8af-4a22-a01b-68b901496435","name":"Charlie Brown","skills":["Java","Spring","Hibernate","MySQL","Docker"],"createdAt":{"$$date":1756364657871},"updatedAt":{"$$date":1756364657871}}
 {"_id":"f6f58e84-262d-4dcc-a9ae-9d670cad6bff","name":"Alice Smith","skills":["JavaScript","React","Node.js","HTML","CSS","MongoDB"],"createdAt":{"$$date":1756364657871},"updatedAt":{"$$date":1756364657871}}
 {"_id":"f7009d87-ea20-4c04-961b-c420f3a624be","name":"Ethan Hunt","skills":["React","Redux","JavaScript","CSS","Sass","Webpack"],"createdAt":{"$$date":1756364657871},"updatedAt":{"$$date":1756364657871}}
 {"$$indexCreated":{"fieldName":"name","unique":false,"sparse":false}}
-{"_id":"58f8109b-25ca-4aa2-82b3-134ac3ff400f","name":"DbgUser","skills":["X"],"createdAt":{"$$date":1758559792781},"updatedAt":{"$$date":1758559792781}}
-{"_id":"6319f716-82ec-448a-bd43-ca33076b9e45","name":"DbgUser2","skills":["X"],"createdAt":{"$$date":1758559792801},"updatedAt":{"$$date":1758559792801}}
-{"_id":"6319f716-82ec-448a-bd43-ca33076b9e45","name":"DbgUser2-Edited","skills":["Y"],"createdAt":{"$$date":1758559792801},"updatedAt":{"$$date":1758559792814}}
+{"_id":"98f1beb3-9a33-44f9-8e49-cba4852c41c3","name":"Johnny","skills":["React","Docker","AI","Typescript"],"createdAt":{"$$date":1758562389214},"updatedAt":{"$$date":1758562389214}}

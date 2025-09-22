@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
+import React, { useState, useContext, createContext } from "react";
 
 // Create a context for the toast
 export const ToastContext = createContext();
@@ -19,12 +19,19 @@ export const ToastProvider = ({ children }) => {
       type,
     });
 
+    // also publish to a dedicated aria-live region if present
+    const live = document.getElementById("app-status");
+    if (live) {
+      live.textContent = message;
+    }
+
     // Hide toast after 3 seconds
     setTimeout(() => {
       setToast((prevToast) => ({
         ...prevToast,
         visible: false,
       }));
+      if (live) live.textContent = "";
     }, 3000);
   };
 
@@ -34,6 +41,8 @@ export const ToastProvider = ({ children }) => {
       {toast.visible && (
         <div
           className={`toast ${toast.type} ${!toast.visible ? "hidden" : ""}`}
+          role="status"
+          aria-live="polite"
         >
           <div id="toast-message">{toast.message}</div>
         </div>

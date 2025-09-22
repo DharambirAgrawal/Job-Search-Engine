@@ -16,6 +16,7 @@ const Jobs = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     loadJobs();
   }, []);
 
@@ -149,16 +150,24 @@ const Jobs = () => {
               required
             ></textarea>
           </div>
-          <button type="submit" className="btn">
-            Add Job
+          <button type="submit" className="btn" disabled={loading} aria-busy={loading}>
+            {loading ? (
+              <>
+                <span className="btn-inline">
+                  Adding...
+                </span>
+              </>
+            ) : (
+              "Add Job"
+            )}
           </button>
         </form>
       </div>
 
       <div className="card">
         <h3>Job List</h3>
-        <button onClick={loadJobs} className="btn btn-small">
-          Refresh
+        <button onClick={loadJobs} className="btn btn-small" disabled={loading} aria-disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
         </button>
         <div id="jobs-list" className="list-container">
           {loading ? (

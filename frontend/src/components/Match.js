@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
+import Spinner from "./Spinner";
 import { useToast } from "./Toast";
 
 const Match = () => {
@@ -10,6 +11,7 @@ const Match = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     loadUsers();
   }, []);
 
@@ -70,8 +72,14 @@ const Match = () => {
               ))}
             </select>
           </div>
-          <button type="submit" className="btn">
-            Find Matches
+          <button type="submit" className="btn" disabled={loading} aria-busy={loading}>
+            {loading ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <Spinner size={16} /> Finding...
+              </span>
+            ) : (
+              "Find Matches"
+            )}
           </button>
         </form>
       </div>

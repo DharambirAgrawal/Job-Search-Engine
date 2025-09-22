@@ -163,6 +163,30 @@ textarea {
   font-size: 12px;
 }
 
+.btn[disabled],
+.btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner styles */
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-ring {
+  border: 3px solid rgba(0,0,0,0.08);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .button-group {
   display: flex;
   gap: 10px;

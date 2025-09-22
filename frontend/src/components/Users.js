@@ -11,6 +11,7 @@ const Users = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     loadUsers();
   }, []);
 
@@ -107,8 +108,8 @@ const Users = () => {
 
       <div className="card">
         <h3>User List</h3>
-        <button onClick={loadUsers} className="btn btn-small">
-          Refresh
+        <button onClick={loadUsers} className="btn btn-small" aria-label="Refresh users" disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
         </button>
         <div className="list-container">
           {loading ? (
@@ -132,6 +133,7 @@ const Users = () => {
                     onClick={() => handleDeleteUser(user._id)}
                     className="btn btn-small"
                     style={{ marginRight: "8px" }}
+                    aria-label={`Delete user ${user.name}`}
                   >
                     Delete
                   </button>
@@ -143,6 +145,7 @@ const Users = () => {
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="btn btn-small"
+                    aria-label={`Edit user ${user.name}`}
                   >
                     Edit
                   </button>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { api } from "../services/api";
+import Spinner from "./Spinner";
 import { useToast } from "./Toast";
 import "./Skills.css";
 
@@ -95,8 +96,14 @@ const Skills = () => {
               onChange={(e) => setJobTitle(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn">
-            Get Recommendations
+          <button type="submit" className="btn" disabled={loadingRecommendations} aria-busy={loadingRecommendations}>
+            {loadingRecommendations ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <Spinner size={16} /> Getting...
+              </span>
+            ) : (
+              "Get Recommendations"
+            )}
           </button>
         </form>
       </div>
@@ -126,8 +133,14 @@ const Skills = () => {
               required
             />
           </div>
-          <button type="submit" className="btn">
-            Find Path
+          <button type="submit" className="btn" disabled={loadingPath} aria-busy={loadingPath}>
+            {loadingPath ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <Spinner size={16} /> Finding...
+              </span>
+            ) : (
+              "Find Path"
+            )}
           </button>
         </form>
       </div>
