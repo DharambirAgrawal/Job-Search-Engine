@@ -1,8 +1,8 @@
-const { v4: uuidv4 } = require('uuid');
-const { models } = require('../db/nedb-connection');
+const { v4: uuidv4 } = require("uuid");
+const { models } = require("../db/nedb-connection");
 
 class User {
-  constructor(data) {
+  constructor(data = {}) {
     this._id = data._id || uuidv4();
     this.name = data.name;
     this.skills = data.skills || [];
@@ -10,31 +10,37 @@ class User {
     this.updatedAt = data.updatedAt || new Date();
   }
 
+  static fromDoc(doc) {
+    if (!doc) return null;
+    return new User(doc);
+  }
+
   static async find(query = {}) {
     const docs = await models.User.find(query);
-    return docs;
+    return docs.map((d) => User.fromDoc(d));
   }
 
   static async findById(id) {
     const doc = await models.User.findById(id);
-    return doc;
+    return User.fromDoc(doc);
   }
 
   static async create(data) {
     const user = new User(data);
     const result = await models.User.create(user);
-    return result;
+    return User.fromDoc(result);
   }
 
   async save() {
     this.updatedAt = new Date();
-    
-    if (await models.User.findById(this._id)) {
+
+    const exists = await models.User.findById(this._id);
+    if (exists) {
       await models.User.updateOne({ _id: this._id }, this);
       return this;
     } else {
       const result = await models.User.create(this);
-      return result;
+      return User.fromDoc(result);
     }
   }
 
@@ -47,11 +53,10 @@ class User {
   }
 
   static async insertMany(docs) {
-    const users = docs.map(doc => new User(doc));
-    return await models.User.insertMany(users);
+    const users = docs.map((doc) => new User(doc));
+    const res = await models.User.insertMany(users);
+    return res.map((d) => User.fromDoc(d));
   }
 }
-
-module.exports = User;
 
 module.exports = User;

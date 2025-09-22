@@ -1,0 +1,96 @@
+/* Skills Component Styles */
+.skill-recommendation {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+
+.skill-explanation {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.skill-relevance {
+  margin-top: 5px;
+  height: 6px;
+  background-color: #ddd;
+  border-radius: 3px;
+  position: relative;
+}
+
+.relevance-bar {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 3px;
+}
+
+.relevance-text {
+  font-size: 12px;
+  color: #777;
+  margin-top: 2px;
+  display: inline-block;
+}
+
+.skill-path {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.path-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+
+.path-step {
+  display: flex;
+  align-items: center;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.path-explanation {
+  margin-top: 8px;
+  margin-left: 34px;
+  font-size: 14px;
+  color: #666;
+}
+
+.difficulty-indicator {
+  margin-top: 5px;
+  margin-left: 34px;
+  font-size: 14px;
+  color: #777;
+}
+
+.difficulty-star {
+  color: #ddd;
+  margin-right: 2px;
+}
+
+.difficulty-star.filled {
+  color: #f39c12;
+}
+
+.path-arrow {
+  text-align: center;
+  font-size: 20px;
+  color: #999;
+  margin: 5px 0;
+}

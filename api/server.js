@@ -1,7 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const dotenv = require("dotenv");
+
+// Load environment variables from .env file
+dotenv.config();
+
 const { connectDB } = require("../db/nedb-connection");
-require("dotenv").config();
 
 // Import routes
 const userRoutes = require("./routes/users");
@@ -20,20 +25,14 @@ connectDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
 
-// Routes
+// API Routes
 app.use("/api/users", userRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/matcher", matchRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/health", healthRoutes);
-
-// Root route
-app.get("/", (req, res) => {
-  res.sendFile("index.html", { root: "public" });
-});
 
 // API info route
 app.get("/api", (req, res) => {
@@ -47,6 +46,14 @@ app.get("/api", (req, res) => {
       skills: "/api/skills",
     },
   });
+});
+
+// Serve static files from React app
+app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+// Simple root route to serve the React app
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
 // Error handling middleware
