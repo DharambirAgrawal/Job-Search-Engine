@@ -15,6 +15,7 @@ const matchRoutes = require("./routes/match");
 const searchRoutes = require("./routes/search");
 const skillRoutes = require("./routes/skills");
 const healthRoutes = require("./routes/health");
+const insightsRoutes = require("./routes/insights");
 
 // Initialize express app
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api/matcher", matchRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/insights", insightsRoutes);
 
 // API info route
 app.get("/api", (req, res) => {
@@ -44,6 +46,7 @@ app.get("/api", (req, res) => {
       match: "/api/matcher/:userId",
       search: "/api/search?q=query",
       skills: "/api/skills",
+      jobFit: "/api/insights/job-fit",
     },
   });
 });

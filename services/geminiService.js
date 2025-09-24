@@ -84,6 +84,35 @@ class GeminiService {
   }
 
   /**
+   * Provide AI analysis for how well a user's skills fit a specific job
+   * Returns structured JSON with: summary, strengths, gaps, learningPlan, pitch
+   *
+   * @param {Array} userSkills
+   * @param {Array} jobSkills
+   * @param {String} jobTitle
+   * @param {String} company
+   * @returns {Promise<Object|null>}
+   */
+  async getJobFitAnalysis(userSkills, jobSkills, jobTitle, company = "") {
+    if (!this.isAvailable) return null;
+    try {
+      const prompt = this._buildJobFitPrompt(
+        userSkills,
+        jobSkills,
+        jobTitle,
+        company
+      );
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      return this._parseJobFitResponse(text);
+    } catch (error) {
+      console.error("Error getting AI job fit analysis:", error);
+      return null;
+    }
+  }
+
+  /**
    * Build a prompt for skill recommendations
    *
    * @private
@@ -164,6 +193,41 @@ class GeminiService {
       console.error("Error parsing AI recommendations:", error);
       return [];
     }
+  }
+
+  /**
+   * Build a prompt for job fit analysis
+   * @private
+   */
+  _buildJobFitPrompt(userSkills, jobSkills, jobTitle, company) {
+    return `You are an expert technical career coach.
+Given a candidate with skills: ${userSkills.join(", ") || "(none)"}
+And a job titled: ${jobTitle}${
+      company ? ` at ${company}` : ""
+    } requiring skills: ${jobSkills.join(", ") || "(none)"}
+Provide a concise JSON object ONLY with keys: summary (string), strengths (array of strings), gaps (array of strings), learningPlan (array of objects with step, focus, rationale), pitch (string tailored short personal pitch), prioritySkills (array of objects with skill, impact (0-1), reason).
+Keep items actionable, avoid generic fluff. JSON only, no markdown.`;
+  }
+
+  /**
+   * Parse job fit response
+   * @private
+   */
+  _parseJobFitResponse(response) {
+    try {
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) return JSON.parse(jsonMatch[0]);
+    } catch (e) {
+      console.error("Error parsing job fit response", e);
+    }
+    return {
+      summary: "AI analysis unavailable.",
+      strengths: [],
+      gaps: [],
+      learningPlan: [],
+      pitch: "",
+      prioritySkills: [],
+    };
   }
 
   /**

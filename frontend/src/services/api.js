@@ -151,4 +151,37 @@ export const api = {
       throw error;
     }
   },
+
+  // Insights - AI Job Fit
+  getJobFit: async ({
+    userId,
+    jobId,
+    userSkills,
+    jobSkills,
+    jobTitle,
+    company,
+  }) => {
+    try {
+      const payload = {
+        userId,
+        jobId,
+        userSkills,
+        jobSkills,
+        jobTitle,
+        company,
+      };
+      // Remove undefined keys to keep payload clean
+      Object.keys(payload).forEach(
+        (k) => payload[k] === undefined && delete payload[k]
+      );
+      const response = await axios.post(
+        `${API_BASE_URL}/insights/job-fit`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error getting job fit analysis:", error);
+      throw error;
+    }
+  },
 };

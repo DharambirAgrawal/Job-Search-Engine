@@ -15,6 +15,7 @@ import Jobs from "./Jobs";
 import Match from "./Match";
 import Search from "./Search";
 import Skills from "./Skills";
+import Insights from "./Insights";
 import Toast from "./Toast";
 
 function RouteTitle() {
@@ -123,6 +124,14 @@ function App() {
             >
               Skills
             </NavLink>
+            <NavLink
+              to="/insights"
+              className={({ isActive }) =>
+                isActive ? "tab-btn active" : "tab-btn"
+              }
+            >
+              Insights
+            </NavLink>
           </div>
         </nav>
 
@@ -147,6 +156,7 @@ function App() {
             <Route path="/match" element={<Match />} />
             <Route path="/search" element={<Search />} />
             <Route path="/skills" element={<Skills />} />
+            <Route path="/insights" element={<Insights />} />
           </Routes>
         </main>
 
