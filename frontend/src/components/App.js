@@ -38,8 +38,13 @@ function RouteTitle() {
   return null;
 }
 
+const THEME_KEY = "jse-theme";
+
 function App() {
   const [counts, setCounts] = useState({ users: 0, jobs: 0 });
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem(THEME_KEY) || "light"
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -56,7 +61,7 @@ function App() {
           });
         }
       } catch (e) {
-        // ignore errors for header stats
+        /* ignore */
       }
     };
     loadCounts();
@@ -64,25 +69,59 @@ function App() {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    // apply theme class to body
+    document.body.classList.toggle("dark", theme === "dark");
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+
   return (
     <Router>
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
       <div className="container">
-        <header>
+        <header role="banner">
+          <div className="theme-toggle-wrapper">
+            <button
+              type="button"
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              aria-label="Toggle color theme"
+            >
+              {theme === "dark" ? "☀ Light" : "🌙 Dark"}
+            </button>
+          </div>
           <h1>Job Search Engine</h1>
-          <p>A skill-based job matching system</p>
+          <p aria-describedby="app-status">A skill-based job matching system</p>
           <div className="header-stats" aria-hidden={false}>
-            <div className="stat-card">
-              <div className="stat-value">{counts.users}</div>
+            <div
+              className="stat-card"
+              role="status"
+              aria-label={`Total users ${counts.users}`}
+            >
+              <div className="stat-value" data-testid="user-count">
+                {counts.users}
+              </div>
               <div className="stat-label">Users</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-value">{counts.jobs}</div>
+            <div
+              className="stat-card"
+              role="status"
+              aria-label={`Total jobs ${counts.jobs}`}
+            >
+              <div className="stat-value" data-testid="job-count">
+                {counts.jobs}
+              </div>
               <div className="stat-label">Jobs</div>
             </div>
           </div>
         </header>
 
-        <nav>
+        <nav aria-label="Primary">
           <div className="tabs">
             <NavLink
               to="/"
@@ -136,7 +175,7 @@ function App() {
           </div>
         </nav>
 
-        <main>
+        <main id="main" tabIndex={-1}>
           <RouteTitle />
           <div
             aria-live="polite"
@@ -161,7 +200,7 @@ function App() {
           </Routes>
         </main>
 
-        <footer>
+        <footer role="contentinfo">
           <p>Job Search Engine © {new Date().getFullYear()}</p>
         </footer>
 

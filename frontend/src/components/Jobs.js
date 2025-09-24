@@ -17,8 +17,8 @@ const Jobs = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     loadJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadJobs = async () => {
@@ -26,7 +26,7 @@ const Jobs = () => {
     try {
       const data = await api.getJobs();
       setJobs(data);
-    } catch (error) {
+    } catch {
       showToast("Failed to load jobs", "error");
     } finally {
       setLoading(false);
@@ -53,19 +53,19 @@ const Jobs = () => {
       ...jobData,
       skills: jobData.skills
         .split(",")
-        .map((skill) => skill.trim())
-        .filter((skill) => skill),
+        .map((s) => s.trim())
+        .filter(Boolean),
     };
 
     try {
       if (editingJobId) {
         await api.updateJob(editingJobId, submitData);
         showToast("Job updated successfully", "success");
-        setEditingJobId(null);
       } else {
         await api.addJob(submitData);
         showToast("Job added successfully", "success");
       }
+      setEditingJobId(null);
       setJobData({
         title: "",
         company: "",
@@ -74,7 +74,7 @@ const Jobs = () => {
         description: "",
       });
       loadJobs();
-    } catch (error) {
+    } catch {
       showToast(
         editingJobId ? "Failed to update job" : "Failed to add job",
         "error"
@@ -87,9 +87,32 @@ const Jobs = () => {
       await api.deleteJob(jobId);
       showToast("Job deleted successfully", "success");
       loadJobs();
-    } catch (error) {
+    } catch {
       showToast("Failed to delete job", "error");
     }
+  };
+
+  const startEdit = (job) => {
+    setEditingJobId(job._id);
+    setJobData({
+      title: job.title || "",
+      company: job.company || "",
+      location: job.location || "",
+      skills: (job.skills || []).join(", "),
+      description: job.description || "",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEdit = () => {
+    setEditingJobId(null);
+    setJobData({
+      title: "",
+      company: "",
+      location: "",
+      skills: "",
+      description: "",
+    });
   };
 
   return (
@@ -97,8 +120,12 @@ const Jobs = () => {
       <h2>Job Management</h2>
 
       <div className="card">
-        <h3>Add New Job</h3>
-        <form id="add-job-form" onSubmit={handleSubmit}>
+        <h3>{editingJobId ? "Edit Job" : "Add New Job"}</h3>
+        <form
+          id="add-job-form"
+          onSubmit={handleSubmit}
+          aria-label={editingJobId ? "Edit existing job" : "Add new job"}
+        >
           <div className="form-group">
             <label htmlFor="job-title">Title:</label>
             <input
@@ -151,20 +178,43 @@ const Jobs = () => {
               required
             ></textarea>
           </div>
-          <button
-            type="submit"
-            className="btn"
-            disabled={loading}
-            aria-busy={loading}
-          >
-            {loading ? (
-              <>
-                <span className="btn-inline">Adding...</span>
-              </>
-            ) : (
-              "Add Job"
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <button
+              type="submit"
+              className="btn"
+              disabled={loading}
+              aria-busy={loading}
+            >
+              {loading ? (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <span
+                    className="spinner-ring"
+                    style={{ width: 16, height: 16, borderWidth: 3 }}
+                  ></span>
+                  {editingJobId ? "Saving..." : "Adding..."}
+                </span>
+              ) : editingJobId ? (
+                "Save Changes"
+              ) : (
+                "Add Job"
+              )}
+            </button>
+            {editingJobId && (
+              <button
+                type="button"
+                className="btn outline"
+                onClick={cancelEdit}
+              >
+                Cancel
+              </button>
             )}
-          </button>
+          </div>
         </form>
       </div>
 
@@ -180,7 +230,7 @@ const Jobs = () => {
         </button>
         <div id="jobs-list" className="list-container">
           {loading ? (
-            <div className="list-grid">
+            <div className="list-grid" aria-busy="true">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="list-item card" aria-hidden="true">
                   <Skeleton
@@ -204,7 +254,12 @@ const Jobs = () => {
           ) : (
             <div className="list-grid">
               {jobs.map((job) => (
-                <div key={job._id} className="list-item card">
+                <div
+                  key={job._id}
+                  className="list-item card"
+                  tabIndex={0}
+                  aria-label={`Job ${job.title} at ${job.company}`}
+                >
                   <h4>{job.title}</h4>
                   <p>
                     <strong>Company:</strong> {job.company}
@@ -212,39 +267,27 @@ const Jobs = () => {
                   <p>
                     <strong>Location:</strong> {job.location}
                   </p>
-                  <p>
+                  <p style={{ fontSize: 13 }}>
                     <strong>Description:</strong> {job.description}
                   </p>
                   <div className="skills-list">
                     {job.skills &&
-                      job.skills.map((skill, index) => (
-                        <span key={index} className="skill-tag">
+                      job.skills.map((skill, idx) => (
+                        <span key={idx} className="skill-tag">
                           {skill}
                         </span>
                       ))}
                   </div>
-                  <div style={{ marginTop: "10px" }}>
+                  <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
                     <button
                       onClick={() => handleDeleteJob(job._id)}
-                      className="btn btn-small"
-                      style={{ marginRight: "8px" }}
+                      className="btn btn-small secondary"
                     >
                       Delete
                     </button>
                     <button
-                      onClick={() => {
-                        // populate form for editing
-                        setEditingJobId(job._id);
-                        setJobData({
-                          title: job.title || "",
-                          company: job.company || "",
-                          location: job.location || "",
-                          skills: (job.skills || []).join(", "),
-                          description: job.description || "",
-                        });
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
-                      className="btn btn-small"
+                      onClick={() => startEdit(job)}
+                      className="btn btn-small outline"
                     >
                       Edit
                     </button>

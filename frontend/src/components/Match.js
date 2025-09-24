@@ -20,14 +20,12 @@ const Match = () => {
     try {
       const data = await api.getUsers();
       setUsers(data);
-    } catch (error) {
+    } catch {
       showToast("Failed to load users", "error");
     }
   };
 
-  const handleUserChange = (e) => {
-    setSelectedUser(e.target.value);
-  };
+  const handleUserChange = (e) => setSelectedUser(e.target.value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +40,7 @@ const Match = () => {
     try {
       const data = await api.getMatches(selectedUser);
       setMatches(data);
-    } catch (error) {
+    } catch {
       showToast("Failed to find matches", "error");
       setMatches([]);
     } finally {
@@ -56,7 +54,11 @@ const Match = () => {
 
       <div className="card">
         <h3>Select User</h3>
-        <form id="match-form" onSubmit={handleSubmit}>
+        <form
+          id="match-form"
+          onSubmit={handleSubmit}
+          aria-label="Find matches form"
+        >
           <div className="form-group">
             <label htmlFor="match-user">User:</label>
             <select
@@ -81,7 +83,11 @@ const Match = () => {
           >
             {loading ? (
               <span
-                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
               >
                 <Spinner size={16} /> Finding...
               </span>
@@ -96,7 +102,7 @@ const Match = () => {
         <h3>Matching Jobs</h3>
         <div id="match-results" className="list-container">
           {loading ? (
-            <div className="list-grid">
+            <div className="list-grid" aria-busy="true">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="list-item card" aria-hidden="true">
                   <Skeleton
@@ -121,43 +127,60 @@ const Match = () => {
             </p>
           ) : (
             <div className="list-grid">
-              {matches.map((job) => (
-                <div key={job._id} className="list-item card">
-                  <h4>{job.title}</h4>
-                  <p>
-                    <strong>Company:</strong> {job.company}
-                  </p>
-                  <p>
-                    <strong>Match Score:</strong>{" "}
-                    <span className="match-score">
-                      {job.matchScore.toFixed(2)}%
-                    </span>
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {job.location}
-                  </p>
-                  <div className="skills-list">
-                    {job.skills &&
-                      job.skills.map((skill, index) => (
-                        <span key={index} className="skill-tag">
-                          {skill}
-                        </span>
-                      ))}
-                  </div>
-                  {job.missingSkills && job.missingSkills.length > 0 && (
-                    <div className="suggestion-box">
-                      <h4>Skills to Learn:</h4>
-                      <div className="skills-list">
-                        {job.missingSkills.map((skill, index) => (
-                          <span key={index} className="skill-tag suggestion">
+              {matches.map((job) => {
+                const score = job.matchScore ? job.matchScore.toFixed(2) : 0;
+                return (
+                  <div
+                    key={job._id}
+                    className="list-item card"
+                    tabIndex={0}
+                    aria-label={`Job ${job.title} match score ${score}%`}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: 8,
+                      }}
+                    >
+                      <h4 style={{ marginBottom: 4 }}>{job.title}</h4>
+                      <span
+                        className="match-score-badge"
+                        aria-label={`Match score ${score}%`}
+                      >
+                        {score}%
+                      </span>
+                    </div>
+                    <p>
+                      <strong>Company:</strong> {job.company}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {job.location}
+                    </p>
+                    <div className="skills-list">
+                      {job.skills &&
+                        job.skills.map((skill, idx) => (
+                          <span key={idx} className="skill-tag">
                             {skill}
                           </span>
                         ))}
-                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {job.missingSkills && job.missingSkills.length > 0 && (
+                      <div className="suggestion-box" style={{ marginTop: 14 }}>
+                        <h4>Skills to Learn:</h4>
+                        <div className="skills-list">
+                          {job.missingSkills.map((skill, idx) => (
+                            <span key={idx} className="skill-tag suggestion">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

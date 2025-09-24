@@ -12,18 +12,15 @@ const Search = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!searchQuery.trim()) {
       showToast("Please enter a search term", "error");
       return;
     }
-
     setLoading(true);
-
     try {
       const data = await api.searchJobs(searchQuery);
       setSearchResults(data);
-    } catch (error) {
+    } catch {
       showToast("Failed to search jobs", "error");
       setSearchResults([]);
     } finally {
@@ -34,10 +31,14 @@ const Search = () => {
   return (
     <section id="search" className="tab-content">
       <h2>Search Jobs</h2>
-
       <div className="card">
         <h3>Search</h3>
-        <form id="search-form" onSubmit={handleSubmit}>
+        <form
+          id="search-form"
+          onSubmit={handleSubmit}
+          role="search"
+          aria-label="Job search form"
+        >
           <div className="form-group">
             <label htmlFor="search-query">Search Query:</label>
             <input
@@ -72,7 +73,7 @@ const Search = () => {
         <h3>Search Results</h3>
         <div id="search-results" className="list-container">
           {loading ? (
-            <div className="list-grid">
+            <div className="list-grid" aria-busy="true">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="list-item card" aria-hidden="true">
                   <Skeleton
@@ -93,38 +94,54 @@ const Search = () => {
             </div>
           ) : searchResults.length === 0 ? (
             <p className="info-message">
-              No results found or enter a search query
+              No results yet. Try searching for a role or technology.
             </p>
           ) : (
             <div className="list-grid">
-              {searchResults.map((job) => (
-                <div key={job._id} className="list-item card">
-                  <h4>{job.title}</h4>
-                  <p>
-                    <strong>Company:</strong> {job.company}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {job.location}
-                  </p>
-                  <p>
-                    <strong>Relevance:</strong>{" "}
-                    <span className="match-score">
-                      {job.relevance.toFixed(2)}%
-                    </span>
-                  </p>
-                  <p>
-                    <strong>Description:</strong> {job.description}
-                  </p>
-                  <div className="skills-list">
-                    {job.skills &&
-                      job.skills.map((skill, index) => (
-                        <span key={index} className="skill-tag">
-                          {skill}
-                        </span>
-                      ))}
+              {searchResults.map((job) => {
+                const relevancePct = job.relevance
+                  ? job.relevance.toFixed(2)
+                  : 0;
+                return (
+                  <div
+                    key={job._id}
+                    className="list-item card"
+                    tabIndex={0}
+                    aria-label={`Job ${job.title} relevance ${relevancePct}%`}
+                  >
+                    <h4>{job.title}</h4>
+                    <p>
+                      <strong>Company:</strong> {job.company}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {job.location}
+                    </p>
+                    <p style={{ marginBottom: 4 }}>
+                      <strong>Relevance:</strong>{" "}
+                      <span className="match-score">{relevancePct}%</span>
+                    </p>
+                    <div className="relevance-wrapper">
+                      <div className="relevance-bar-track" aria-hidden="true">
+                        <div
+                          className="relevance-bar-fill"
+                          style={{ "--value": `${relevancePct}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <p style={{ fontSize: 13, marginTop: 8 }}>
+                      <strong>Description:</strong> {job.description}
+                    </p>
+                    <div className="skills-list">
+                      {job.skills &&
+                        job.skills.map((skill, index) => (
+                          <span key={index} className="skill-tag">
+                            {skill}
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

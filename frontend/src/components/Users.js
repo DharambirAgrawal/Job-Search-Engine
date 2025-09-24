@@ -12,8 +12,7 @@ const Users = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    loadUsers();
+    loadUsers(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadUsers = async () => {
@@ -40,19 +39,19 @@ const Users = () => {
       name: userName,
       skills: userSkills
         .split(",")
-        .map((skill) => skill.trim())
-        .filter((skill) => skill),
+        .map((s) => s.trim())
+        .filter(Boolean),
     };
 
     try {
       if (editingUserId) {
         await api.updateUser(editingUserId, userData);
         showToast("User updated successfully", "success");
-        setEditingUserId(null);
       } else {
         await api.addUser(userData);
         showToast("User added successfully", "success");
       }
+      setEditingUserId(null);
       setUserName("");
       setUserSkills("");
       loadUsers();
@@ -69,7 +68,7 @@ const Users = () => {
       await api.deleteUser(userId);
       showToast("User deleted successfully", "success");
       loadUsers();
-    } catch (error) {
+    } catch {
       showToast("Failed to delete user", "error");
     }
   };
@@ -79,8 +78,12 @@ const Users = () => {
       <h2>User Management</h2>
 
       <div className="card">
-        <h3>Add New User</h3>
-        <form id="add-user-form" onSubmit={handleSubmit}>
+        <h3>{editingUserId ? "Edit User" : "Add New User"}</h3>
+        <form
+          id="add-user-form"
+          onSubmit={handleSubmit}
+          aria-label={editingUserId ? "Edit existing user" : "Add new user"}
+        >
           <div className="form-group">
             <label htmlFor="user-name">Name:</label>
             <input
@@ -89,6 +92,7 @@ const Users = () => {
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
               required
+              aria-required="true"
             />
           </div>
           <div className="form-group">
@@ -101,9 +105,36 @@ const Users = () => {
               onChange={(e) => setUserSkills(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn">
-            Add User
-          </button>
+          <div
+            className="button-group"
+            style={{
+              display: "flex",
+              gap: 10,
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              type="submit"
+              className="btn"
+              aria-label={editingUserId ? "Save user changes" : "Add user"}
+            >
+              {editingUserId ? "Save Changes" : "Add User"}
+            </button>
+            {editingUserId && (
+              <button
+                type="button"
+                className="btn outline"
+                onClick={() => {
+                  setEditingUserId(null);
+                  setUserName("");
+                  setUserSkills("");
+                }}
+                aria-label="Cancel editing user"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       </div>
 
@@ -119,7 +150,7 @@ const Users = () => {
         </button>
         <div className="list-container">
           {loading ? (
-            <div className="list-grid">
+            <div className="list-grid" aria-busy="true">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="list-item card" aria-hidden="true">
                   <Skeleton
@@ -139,7 +170,12 @@ const Users = () => {
           ) : (
             <div className="list-grid">
               {users.map((user) => (
-                <div key={user._id} className="list-item card">
+                <div
+                  key={user._id}
+                  className="list-item card"
+                  tabIndex={0}
+                  aria-label={`User ${user.name}`}
+                >
                   <h4>{user.name}</h4>
                   <div className="skills-list">
                     {user.skills &&
@@ -149,11 +185,16 @@ const Users = () => {
                         </span>
                       ))}
                   </div>
-                  <div style={{ marginTop: "10px" }}>
+                  <div
+                    style={{
+                      marginTop: 10,
+                      display: "flex",
+                      gap: 8,
+                    }}
+                  >
                     <button
                       onClick={() => handleDeleteUser(user._id)}
-                      className="btn btn-small"
-                      style={{ marginRight: "8px" }}
+                      className="btn btn-small secondary"
                       aria-label={`Delete user ${user.name}`}
                     >
                       Delete
@@ -165,7 +206,7 @@ const Users = () => {
                         setUserSkills((user.skills || []).join(", "));
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }}
-                      className="btn btn-small"
+                      className="btn btn-small outline"
                       aria-label={`Edit user ${user.name}`}
                     >
                       Edit

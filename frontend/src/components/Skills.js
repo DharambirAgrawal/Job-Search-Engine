@@ -18,18 +18,15 @@ const Skills = () => {
 
   const handleRecommendSubmit = async (e) => {
     e.preventDefault();
-
     if (!recommendSkills.trim()) {
       showToast("Please enter at least one skill", "error");
       return;
     }
-
     setLoadingRecommendations(true);
-
     try {
       const data = await api.getSkillRecommendations(recommendSkills, jobTitle);
       setRecommendations(data);
-    } catch (error) {
+    } catch {
       showToast("Failed to get skill recommendations", "error");
       setRecommendations([]);
     } finally {
@@ -39,18 +36,15 @@ const Skills = () => {
 
   const handlePathSubmit = async (e) => {
     e.preventDefault();
-
     if (!fromSkill.trim() || !toSkill.trim()) {
       showToast("Please enter both skills", "error");
       return;
     }
-
     setLoadingPath(true);
-
     try {
       const data = await api.getSkillPath(fromSkill, toSkill);
       setSkillPath(data.path || []);
-    } catch (error) {
+    } catch {
       showToast("Failed to find skill path", "error");
       setSkillPath([]);
     } finally {
@@ -62,20 +56,22 @@ const Skills = () => {
     const currentSkills = recommendSkills
       .split(",")
       .map((s) => s.trim())
-      .filter((s) => s);
+      .filter(Boolean);
     if (!currentSkills.includes(skill)) {
-      const newSkills = [...currentSkills, skill];
-      setRecommendSkills(newSkills.join(", "));
+      setRecommendSkills([...currentSkills, skill].join(", "));
     }
   };
 
   return (
     <section id="skills" className="tab-content">
       <h2>Skills Analysis</h2>
-
       <div className="card">
         <h3>Get Skill Recommendations</h3>
-        <form id="skill-recommend-form" onSubmit={handleRecommendSubmit}>
+        <form
+          id="skill-recommend-form"
+          onSubmit={handleRecommendSubmit}
+          aria-label="Skill recommendations form"
+        >
           <div className="form-group">
             <label htmlFor="recommend-skills">Skills (comma-separated):</label>
             <input
@@ -105,7 +101,11 @@ const Skills = () => {
           >
             {loadingRecommendations ? (
               <span
-                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
               >
                 <Spinner size={16} /> Getting...
               </span>
@@ -118,7 +118,11 @@ const Skills = () => {
 
       <div className="card">
         <h3>Find Skill Path</h3>
-        <form id="skill-path-form" onSubmit={handlePathSubmit}>
+        <form
+          id="skill-path-form"
+          onSubmit={handlePathSubmit}
+          aria-label="Skill path form"
+        >
           <div className="form-group">
             <label htmlFor="from-skill">From Skill:</label>
             <input
@@ -149,7 +153,11 @@ const Skills = () => {
           >
             {loadingPath ? (
               <span
-                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
               >
                 <Spinner size={16} /> Finding...
               </span>
@@ -164,7 +172,7 @@ const Skills = () => {
         <h3>Results</h3>
         <div id="skill-results" className="list-container">
           {loadingRecommendations && (
-            <div className="list-grid">
+            <div className="list-grid" aria-busy="true">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="list-item card" aria-hidden="true">
                   <Skeleton
@@ -181,7 +189,7 @@ const Skills = () => {
             </div>
           )}
           {loadingPath && (
-            <div className="list-grid">
+            <div className="list-grid" aria-busy="true">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="list-item card" aria-hidden="true">
                   <Skeleton
@@ -200,35 +208,53 @@ const Skills = () => {
           {!loadingRecommendations && recommendations.length > 0 && (
             <div className="list-item">
               <h4>Recommended Skills</h4>
-              <div className="skills-list">
-                {recommendations.map((rec, index) => (
-                  <div key={index} className="skill-recommendation">
-                    <span
-                      className="skill-tag suggestion"
-                      onClick={() => addRecommendedSkill(rec.skill)}
+              <div
+                className="skills-list"
+                style={{ flexDirection: "column", alignItems: "stretch" }}
+              >
+                {recommendations.map((rec, index) => {
+                  const rel = rec.relevance
+                    ? Math.round(rec.relevance * 100)
+                    : null;
+                  return (
+                    <div
+                      key={index}
+                      className="skill-recommendation"
+                      style={{ background: "var(--card-color)" }}
                     >
-                      {rec.skill}
-                    </span>
-                    {rec.explanation && (
-                      <p className="skill-explanation">{rec.explanation}</p>
-                    )}
-                    {rec.relevance && (
-                      <div className="skill-relevance">
+                      <span
+                        className="skill-tag suggestion"
+                        onClick={() => addRecommendedSkill(rec.skill)}
+                      >
+                        {rec.skill}
+                      </span>
+                      {rec.explanation && (
+                        <p className="skill-explanation">{rec.explanation}</p>
+                      )}
+                      {rel !== null && (
                         <div
-                          className="relevance-bar"
-                          style={{
-                            width: `${Math.round(rec.relevance * 100)}%`,
-                          }}
-                        ></div>
-                        <span className="relevance-text">
-                          {Math.round(rec.relevance * 100)}% relevance
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                          className="relevance-wrapper"
+                          style={{ marginTop: 6 }}
+                        >
+                          <div
+                            className="relevance-bar-track"
+                            aria-label={`Relevance ${rel}%`}
+                          >
+                            <div
+                              className="relevance-bar-fill"
+                              style={{ "--value": `${rel}%` }}
+                            ></div>
+                          </div>
+                          <span className="relevance-text">
+                            {rel}% relevance
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              <p style={{ marginTop: "10px", fontSize: "14px" }}>
+              <p style={{ marginTop: 10, fontSize: 14 }}>
                 Click on a skill to add it to your list
               </p>
             </div>
@@ -239,7 +265,11 @@ const Skills = () => {
               <h4>Skill Learning Path</h4>
               <div className="skill-path">
                 {skillPath.map((pathItem, index) => (
-                  <div key={index} className="path-item">
+                  <div
+                    key={index}
+                    className="path-item"
+                    style={{ background: "var(--card-color)" }}
+                  >
                     <div className="path-step">
                       <span className="step-number">{index + 1}</span>
                       <span className="skill-tag">{pathItem.skill}</span>

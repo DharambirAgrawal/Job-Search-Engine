@@ -21,16 +21,13 @@ const Insights = () => {
   const [showMock, setShowMock] = useState(false);
 
   useEffect(() => {
-    const load = async () => {
+    (async () => {
       try {
         const [u, j] = await Promise.all([api.getUsers(), api.getJobs()]);
         setUsers(u || []);
         setJobs(j || []);
-      } catch (e) {
-        // optional
-      }
-    };
-    load();
+      } catch {}
+    })();
   }, []);
 
   const handleAnalyze = async (e) => {
@@ -63,11 +60,8 @@ const Insights = () => {
       const data = await api.getJobFit(payload);
       setAnalysis(data);
     } catch (error) {
-      if (error?.response?.status === 503) {
-        setAiUnavailable(true);
-      } else {
-        showToast("Failed to generate analysis", "error");
-      }
+      if (error?.response?.status === 503) setAiUnavailable(true);
+      else showToast("Failed to generate analysis", "error");
     } finally {
       setLoading(false);
     }
@@ -85,14 +79,13 @@ const Insights = () => {
               background: "#fff4e5",
               padding: "12px 14px",
               border: "1px solid #f0c36d",
-              borderRadius: 6,
+              borderRadius: 8,
               marginBottom: 16,
               fontSize: 14,
             }}
           >
             <strong>AI service unavailable.</strong> Set{" "}
-            <code>GEMINI_API_KEY</code> in your environment to enable real
-            analyses.
+            <code>GEMINI_API_KEY</code> to enable real analyses.
             <div style={{ marginTop: 8 }}>
               <button
                 type="button"
@@ -109,7 +102,7 @@ const Insights = () => {
           <div style={{ marginBottom: 16 }}>
             <button
               type="button"
-              className="btn"
+              className="btn outline"
               onClick={() => {
                 setAnalysis({
                   meta: {
@@ -191,14 +184,14 @@ const Insights = () => {
             </button>
           </div>
         )}
-        <form onSubmit={handleAnalyze}>
+        <form onSubmit={handleAnalyze} aria-label="AI analysis form">
           <div className="form-group">
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
                 type="checkbox"
                 checked={manualMode}
                 onChange={(e) => setManualMode(e.target.checked)}
-              />
+              />{" "}
               Manual input mode
             </label>
           </div>
@@ -292,7 +285,7 @@ const Insights = () => {
       <div className="card">
         <h3>Results</h3>
         {loading && (
-          <div className="list-grid">
+          <div className="list-grid" aria-busy="true">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="list-item card" aria-hidden="true">
                 <Skeleton
@@ -312,7 +305,7 @@ const Insights = () => {
           <p className="info-message">Run an analysis to see insights.</p>
         )}
         {!loading && analysis && (
-          <div className="analysis">
+          <div className="analysis fade-in">
             <h4>Summary</h4>
             <p>{analysis.analysis.summary}</p>
             {analysis.analysis.pitch && (
@@ -324,9 +317,6 @@ const Insights = () => {
             <div className="list-grid" style={{ marginTop: 20 }}>
               <div className="list-item card">
                 <h4>Strengths</h4>
-                {(analysis.analysis.strengths || []).length === 0 && (
-                  <p>No strengths detected.</p>
-                )}
                 <ul style={{ paddingLeft: 18 }}>
                   {(analysis.analysis.strengths || []).map((s, i) => (
                     <li key={i}>{s}</li>
@@ -335,9 +325,6 @@ const Insights = () => {
               </div>
               <div className="list-item card">
                 <h4>Skill Gaps</h4>
-                {(analysis.analysis.gaps || []).length === 0 && (
-                  <p>No gaps detected.</p>
-                )}
                 <ul style={{ paddingLeft: 18 }}>
                   {(analysis.analysis.gaps || []).map((g, i) => (
                     <li key={i}>{g}</li>
@@ -346,9 +333,6 @@ const Insights = () => {
               </div>
               <div className="list-item card">
                 <h4>Priority Skills</h4>
-                {(analysis.analysis.prioritySkills || []).length === 0 && (
-                  <p>No priorities.</p>
-                )}
                 <ul style={{ paddingLeft: 18 }}>
                   {(analysis.analysis.prioritySkills || []).map((p, i) => (
                     <li key={i}>
@@ -366,14 +350,11 @@ const Insights = () => {
             </div>
             <div className="card" style={{ marginTop: 20 }}>
               <h4>Learning Plan</h4>
-              {(analysis.analysis.learningPlan || []).length === 0 && (
-                <p>No plan available.</p>
-              )}
               <ol style={{ paddingLeft: 18 }}>
                 {(analysis.analysis.learningPlan || []).map((step, i) => (
                   <li key={i} style={{ marginBottom: 8 }}>
-                    <strong>{step.step || step.focus}</strong> –{" "}
-                    {step.focus && step.step ? step.focus : ""}
+                    <strong>{step.step || step.focus}</strong>{" "}
+                    {step.focus && step.step ? "– " + step.focus : ""}
                     {step.rationale && (
                       <div style={{ fontSize: 12, color: "#555" }}>
                         {step.rationale}
@@ -385,14 +366,16 @@ const Insights = () => {
             </div>
             <div
               className="meta"
-              style={{ marginTop: 20, fontSize: 12, color: "#666" }}
+              style={{
+                marginTop: 20,
+                fontSize: 12,
+                color: "var(--text-light)",
+              }}
             >
               <p>
                 Compared <strong>{analysis.meta.userSkills.length}</strong> user
-                skills to
-                <strong> {analysis.meta.jobSkills.length}</strong> job skills
-                for
-                <strong> {analysis.meta.jobTitle}</strong>
+                skills to <strong>{analysis.meta.jobSkills.length}</strong> job
+                skills for <strong>{analysis.meta.jobTitle}</strong>
                 {analysis.meta.company && ` @ ${analysis.meta.company}`}
               </p>
               <p>
