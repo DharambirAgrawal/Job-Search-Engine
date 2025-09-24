@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useToast } from "./Toast";
+import Skeleton from "./Skeleton";
 
 const Jobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -150,12 +151,15 @@ const Jobs = () => {
               required
             ></textarea>
           </div>
-          <button type="submit" className="btn" disabled={loading} aria-busy={loading}>
+          <button
+            type="submit"
+            className="btn"
+            disabled={loading}
+            aria-busy={loading}
+          >
             {loading ? (
               <>
-                <span className="btn-inline">
-                  Adding...
-                </span>
+                <span className="btn-inline">Adding...</span>
               </>
             ) : (
               "Add Job"
@@ -166,63 +170,88 @@ const Jobs = () => {
 
       <div className="card">
         <h3>Job List</h3>
-        <button onClick={loadJobs} className="btn btn-small" disabled={loading} aria-disabled={loading}>
+        <button
+          onClick={loadJobs}
+          className="btn btn-small"
+          disabled={loading}
+          aria-disabled={loading}
+        >
           {loading ? "Refreshing..." : "Refresh"}
         </button>
         <div id="jobs-list" className="list-container">
           {loading ? (
-            <p className="loading">Loading jobs...</p>
+            <div className="list-grid">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="list-item card" aria-hidden="true">
+                  <Skeleton
+                    height={20}
+                    style={{ marginBottom: 10, width: "60%" }}
+                  />
+                  <Skeleton
+                    height={14}
+                    style={{ marginBottom: 6, width: "80%" }}
+                  />
+                  <Skeleton
+                    height={12}
+                    style={{ marginBottom: 6, width: "40%" }}
+                  />
+                  <Skeleton height={48} style={{ marginTop: 8 }} />
+                </div>
+              ))}
+            </div>
           ) : jobs.length === 0 ? (
             <p className="info-message">No jobs found</p>
           ) : (
-            jobs.map((job) => (
-              <div key={job._id} className="list-item">
-                <h4>{job.title}</h4>
-                <p>
-                  <strong>Company:</strong> {job.company}
-                </p>
-                <p>
-                  <strong>Location:</strong> {job.location}
-                </p>
-                <p>
-                  <strong>Description:</strong> {job.description}
-                </p>
-                <div className="skills-list">
-                  {job.skills &&
-                    job.skills.map((skill, index) => (
-                      <span key={index} className="skill-tag">
-                        {skill}
-                      </span>
-                    ))}
+            <div className="list-grid">
+              {jobs.map((job) => (
+                <div key={job._id} className="list-item card">
+                  <h4>{job.title}</h4>
+                  <p>
+                    <strong>Company:</strong> {job.company}
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {job.location}
+                  </p>
+                  <p>
+                    <strong>Description:</strong> {job.description}
+                  </p>
+                  <div className="skills-list">
+                    {job.skills &&
+                      job.skills.map((skill, index) => (
+                        <span key={index} className="skill-tag">
+                          {skill}
+                        </span>
+                      ))}
+                  </div>
+                  <div style={{ marginTop: "10px" }}>
+                    <button
+                      onClick={() => handleDeleteJob(job._id)}
+                      className="btn btn-small"
+                      style={{ marginRight: "8px" }}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => {
+                        // populate form for editing
+                        setEditingJobId(job._id);
+                        setJobData({
+                          title: job.title || "",
+                          company: job.company || "",
+                          location: job.location || "",
+                          skills: (job.skills || []).join(", "),
+                          description: job.description || "",
+                        });
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="btn btn-small"
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </div>
-                <div style={{ marginTop: "10px" }}>
-                  <button
-                    onClick={() => handleDeleteJob(job._id)}
-                    className="btn btn-small"
-                    style={{ marginRight: "8px" }}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => {
-                      // populate form for editing
-                      setEditingJobId(job._id);
-                      setJobData({
-                        title: job.title || "",
-                        company: job.company || "",
-                        location: job.location || "",
-                        skills: (job.skills || []).join(", "),
-                        description: job.description || "",
-                      });
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="btn btn-small"
-                  >
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>

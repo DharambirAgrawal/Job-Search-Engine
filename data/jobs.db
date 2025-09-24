@@ -13,3 +13,4 @@
 {"_id":"fef40423-2c11-4c0e-9ddd-652af761be4a","title":"Frontend Developer","description":"We are looking for a skilled Frontend Developer who is proficient with React.js. The ideal candidate should have experience building responsive web applications with modern JavaScript frameworks.","requiredSkills":["React","JavaScript","HTML","CSS","Redux"],"location":"Remote","company":"TechCorp","createdAt":{"$$date":1756364657873},"updatedAt":{"$$date":1756364657873}}
 {"$$indexCreated":{"fieldName":"title","unique":false,"sparse":false}}
 {"$$indexCreated":{"fieldName":"company","unique":false,"sparse":false}}
+{"$$deleted":true,"_id":"d8690816-5c42-4566-8acf-aa248eed13f5"}

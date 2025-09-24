@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { api } from "../services/api";
 import Spinner from "./Spinner";
+import Skeleton from "./Skeleton";
 import { useToast } from "./Toast";
 import "./Skills.css";
 
@@ -96,9 +97,16 @@ const Skills = () => {
               onChange={(e) => setJobTitle(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn" disabled={loadingRecommendations} aria-busy={loadingRecommendations}>
+          <button
+            type="submit"
+            className="btn"
+            disabled={loadingRecommendations}
+            aria-busy={loadingRecommendations}
+          >
             {loadingRecommendations ? (
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+              >
                 <Spinner size={16} /> Getting...
               </span>
             ) : (
@@ -133,9 +141,16 @@ const Skills = () => {
               required
             />
           </div>
-          <button type="submit" className="btn" disabled={loadingPath} aria-busy={loadingPath}>
+          <button
+            type="submit"
+            className="btn"
+            disabled={loadingPath}
+            aria-busy={loadingPath}
+          >
             {loadingPath ? (
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+              >
                 <Spinner size={16} /> Finding...
               </span>
             ) : (
@@ -149,9 +164,38 @@ const Skills = () => {
         <h3>Results</h3>
         <div id="skill-results" className="list-container">
           {loadingRecommendations && (
-            <p className="loading">Getting recommendations...</p>
+            <div className="list-grid">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="list-item card" aria-hidden="true">
+                  <Skeleton
+                    height={18}
+                    style={{ marginBottom: 8, width: "60%" }}
+                  />
+                  <Skeleton
+                    height={12}
+                    style={{ marginBottom: 8, width: "80%" }}
+                  />
+                  <Skeleton height={12} style={{ width: "40%" }} />
+                </div>
+              ))}
+            </div>
           )}
-          {loadingPath && <p className="loading">Finding skill path...</p>}
+          {loadingPath && (
+            <div className="list-grid">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="list-item card" aria-hidden="true">
+                  <Skeleton
+                    height={18}
+                    style={{ marginBottom: 8, width: "50%" }}
+                  />
+                  <Skeleton
+                    height={12}
+                    style={{ marginBottom: 8, width: "70%" }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {!loadingRecommendations && recommendations.length > 0 && (
             <div className="list-item">

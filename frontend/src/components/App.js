@@ -1,5 +1,12 @@
-import React, { useEffect } from "react";
-import { HashRouter as Router, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  NavLink,
+  useLocation,
+} from "react-router-dom";
+import { api } from "../services/api";
 import "../styles/App.css";
 
 // Import components
@@ -30,12 +37,47 @@ function RouteTitle() {
 }
 
 function App() {
+  const [counts, setCounts] = useState({ users: 0, jobs: 0 });
+
+  useEffect(() => {
+    let mounted = true;
+    const loadCounts = async () => {
+      try {
+        const [usersData, jobsData] = await Promise.all([
+          api.getUsers(),
+          api.getJobs(),
+        ]);
+        if (mounted) {
+          setCounts({
+            users: (usersData || []).length,
+            jobs: (jobsData || []).length,
+          });
+        }
+      } catch (e) {
+        // ignore errors for header stats
+      }
+    };
+    loadCounts();
+    return () => {
+      mounted = false;
+    };
+  }, []);
   return (
     <Router>
       <div className="container">
         <header>
           <h1>Job Search Engine</h1>
           <p>A skill-based job matching system</p>
+          <div className="header-stats" aria-hidden={false}>
+            <div className="stat-card">
+              <div className="stat-value">{counts.users}</div>
+              <div className="stat-label">Users</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{counts.jobs}</div>
+              <div className="stat-label">Jobs</div>
+            </div>
+          </div>
         </header>
 
         <nav>
@@ -86,7 +128,19 @@ function App() {
 
         <main>
           <RouteTitle />
-          <div aria-live="polite" aria-atomic="true" id="app-status" style={{position:'absolute', left:-9999, top:'auto', width:1, height:1, overflow:'hidden'}}></div>
+          <div
+            aria-live="polite"
+            aria-atomic="true"
+            id="app-status"
+            style={{
+              position: "absolute",
+              left: -9999,
+              top: "auto",
+              width: 1,
+              height: 1,
+              overflow: "hidden",
+            }}
+          ></div>
           <Routes>
             <Route path="/" element={<Users />} />
             <Route path="/jobs" element={<Jobs />} />

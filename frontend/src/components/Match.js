@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
 import Spinner from "./Spinner";
+import Skeleton from "./Skeleton";
 import { useToast } from "./Toast";
 
 const Match = () => {
@@ -72,9 +73,16 @@ const Match = () => {
               ))}
             </select>
           </div>
-          <button type="submit" className="btn" disabled={loading} aria-busy={loading}>
+          <button
+            type="submit"
+            className="btn"
+            disabled={loading}
+            aria-busy={loading}
+          >
             {loading ? (
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+              >
                 <Spinner size={16} /> Finding...
               </span>
             ) : (
@@ -88,49 +96,69 @@ const Match = () => {
         <h3>Matching Jobs</h3>
         <div id="match-results" className="list-container">
           {loading ? (
-            <p className="loading">Finding matches...</p>
+            <div className="list-grid">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="list-item card" aria-hidden="true">
+                  <Skeleton
+                    height={20}
+                    style={{ marginBottom: 8, width: "60%" }}
+                  />
+                  <Skeleton
+                    height={12}
+                    style={{ marginBottom: 8, width: "40%" }}
+                  />
+                  <Skeleton
+                    height={12}
+                    style={{ marginBottom: 8, width: "30%" }}
+                  />
+                  <Skeleton height={40} style={{ marginTop: 8 }} />
+                </div>
+              ))}
+            </div>
           ) : matches.length === 0 ? (
             <p className="info-message">
               No matches found or select a user to find matches
             </p>
           ) : (
-            matches.map((job) => (
-              <div key={job._id} className="list-item">
-                <h4>{job.title}</h4>
-                <p>
-                  <strong>Company:</strong> {job.company}
-                </p>
-                <p>
-                  <strong>Match Score:</strong>{" "}
-                  <span className="match-score">
-                    {job.matchScore.toFixed(2)}%
-                  </span>
-                </p>
-                <p>
-                  <strong>Location:</strong> {job.location}
-                </p>
-                <div className="skills-list">
-                  {job.skills &&
-                    job.skills.map((skill, index) => (
-                      <span key={index} className="skill-tag">
-                        {skill}
-                      </span>
-                    ))}
-                </div>
-                {job.missingSkills && job.missingSkills.length > 0 && (
-                  <div className="suggestion-box">
-                    <h4>Skills to Learn:</h4>
-                    <div className="skills-list">
-                      {job.missingSkills.map((skill, index) => (
-                        <span key={index} className="skill-tag suggestion">
+            <div className="list-grid">
+              {matches.map((job) => (
+                <div key={job._id} className="list-item card">
+                  <h4>{job.title}</h4>
+                  <p>
+                    <strong>Company:</strong> {job.company}
+                  </p>
+                  <p>
+                    <strong>Match Score:</strong>{" "}
+                    <span className="match-score">
+                      {job.matchScore.toFixed(2)}%
+                    </span>
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {job.location}
+                  </p>
+                  <div className="skills-list">
+                    {job.skills &&
+                      job.skills.map((skill, index) => (
+                        <span key={index} className="skill-tag">
                           {skill}
                         </span>
                       ))}
-                    </div>
                   </div>
-                )}
-              </div>
-            ))
+                  {job.missingSkills && job.missingSkills.length > 0 && (
+                    <div className="suggestion-box">
+                      <h4>Skills to Learn:</h4>
+                      <div className="skills-list">
+                        {job.missingSkills.map((skill, index) => (
+                          <span key={index} className="skill-tag suggestion">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>

@@ -8,7 +8,12 @@ const Spinner = ({ size = 24, label = "Loading" }) => {
   };
 
   return (
-    <div className="spinner" role="status" aria-live="polite" aria-label={label}>
+    <div
+      className="spinner"
+      role="status"
+      aria-live="polite"
+      aria-label={label}
+    >
       <div className="spinner-ring" style={style}></div>
     </div>
   );

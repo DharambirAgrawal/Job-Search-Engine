@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useToast } from "./Toast";
+import Skeleton from "./Skeleton";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -108,50 +109,71 @@ const Users = () => {
 
       <div className="card">
         <h3>User List</h3>
-        <button onClick={loadUsers} className="btn btn-small" aria-label="Refresh users" disabled={loading}>
+        <button
+          onClick={loadUsers}
+          className="btn btn-small"
+          aria-label="Refresh users"
+          disabled={loading}
+        >
           {loading ? "Refreshing..." : "Refresh"}
         </button>
         <div className="list-container">
           {loading ? (
-            <p className="loading">Loading users...</p>
+            <div className="list-grid">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="list-item card" aria-hidden="true">
+                  <Skeleton
+                    height={18}
+                    style={{ marginBottom: 8, width: "50%" }}
+                  />
+                  <Skeleton
+                    height={12}
+                    style={{ marginBottom: 8, width: "80%" }}
+                  />
+                  <Skeleton height={12} style={{ width: "60%" }} />
+                </div>
+              ))}
+            </div>
           ) : users.length === 0 ? (
             <p className="info-message">No users found</p>
           ) : (
-            users.map((user) => (
-              <div key={user._id} className="list-item">
-                <h4>{user.name}</h4>
-                <div className="skills-list">
-                  {user.skills &&
-                    user.skills.map((skill, index) => (
-                      <span key={index} className="skill-tag">
-                        {skill}
-                      </span>
-                    ))}
+            <div className="list-grid">
+              {users.map((user) => (
+                <div key={user._id} className="list-item card">
+                  <h4>{user.name}</h4>
+                  <div className="skills-list">
+                    {user.skills &&
+                      user.skills.map((skill, index) => (
+                        <span key={index} className="skill-tag">
+                          {skill}
+                        </span>
+                      ))}
+                  </div>
+                  <div style={{ marginTop: "10px" }}>
+                    <button
+                      onClick={() => handleDeleteUser(user._id)}
+                      className="btn btn-small"
+                      style={{ marginRight: "8px" }}
+                      aria-label={`Delete user ${user.name}`}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingUserId(user._id);
+                        setUserName(user.name || "");
+                        setUserSkills((user.skills || []).join(", "));
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="btn btn-small"
+                      aria-label={`Edit user ${user.name}`}
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </div>
-                <div style={{ marginTop: "10px" }}>
-                  <button
-                    onClick={() => handleDeleteUser(user._id)}
-                    className="btn btn-small"
-                    style={{ marginRight: "8px" }}
-                    aria-label={`Delete user ${user.name}`}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingUserId(user._id);
-                      setUserName(user.name || "");
-                      setUserSkills((user.skills || []).join(", "));
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className="btn btn-small"
-                    aria-label={`Edit user ${user.name}`}
-                  >
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>
