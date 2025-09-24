@@ -16,6 +16,17 @@ export const api = {
     }
   },
 
+  // Health / AI availability
+  getHealth: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/health`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching health:", error);
+      throw error;
+    }
+  },
+
   addUser: async (userData) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/users`, userData);

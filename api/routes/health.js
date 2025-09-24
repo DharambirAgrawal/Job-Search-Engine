@@ -14,6 +14,9 @@ router.get("/", (req, res) => {
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     environment: process.env.NODE_ENV || "development",
+    ai: {
+      enabled: !!process.env.GEMINI_API_KEY,
+    },
   };
 
   res.status(200).json(health);

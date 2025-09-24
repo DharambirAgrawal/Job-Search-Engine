@@ -7,6 +7,8 @@ A job matching system that demonstrates system design, algorithmic thinking, and
 - **Skill-Based Job Matching:** Matches users to jobs using Jaccard similarity and other scoring algorithms
 - **Job Search:** Implements an inverted index for efficient text-based job searching
 - **Skill Graph:** Models relationships between skills for recommendations and upskilling paths
+- **AI Skill Recommendations (Gemini):** Optional AI-enhanced explanations & learning paths (if `GEMINI_API_KEY` provided)
+- **AI Job Fit Insights:** Structured analysis of strengths, gaps, priority skills, personalized pitch & learning plan
 - **RESTful API:** Clean API endpoints for all functionality
 - **Modular Architecture:** Separation of concerns with well-defined services
 - **Simple UI Client:** Web interface for interacting with the system
@@ -83,8 +85,9 @@ The system is built with a modular, service-oriented architecture:
 | GET    | `/api/search?q=term`         | Keyword search jobs                      |
 | GET    | `/api/skills`                | Get all skills in the system             |
 | GET    | `/api/skills/related/:skill` | Get related skills                       |
-| POST   | `/api/skills/recommend`      | Recommend skills based on current skills |
-| POST   | `/api/skills/path`           | Find path between skills                 |
+| GET    | `/api/skills/recommend`      | Recommend skills based on current skills |
+| GET    | `/api/skills/path`           | Find path between skills                 |
+| POST   | `/api/insights/job-fit`      | AI job fit analysis (Gemini, optional)   |
 
 ## 🧪 Algorithms
 
@@ -147,11 +150,11 @@ The search service implements a simple inverted index:
 
 3. Set up environment variables
 
-   ```
-   Create a .env file with:
-   PORT=3000
-   NODE_ENV=development
-   DB_TYPE=local
+   Copy `.env.example` to `.env` and fill in values:
+
+   ```bash
+   cp .env.example .env
+   # (edit .env and optionally add your GEMINI_API_KEY)
    ```
 
 4. Seed the database (optional)
@@ -184,7 +187,57 @@ For deploying to Render, we provide two options:
 2. **Manual Deployment**:
    Follow the detailed instructions in the [Render Deployment Guide](./RENDER_DEPLOYMENT.md).
 
-## �️ Web Interface
+## 🧠 AI Features
+
+The AI enhancements (skill recommendations enrichment, learning paths, and job fit insights) are powered by Google Gemini. These are optional—if no `GEMINI_API_KEY` is set the system still works with graph-based logic and will show helpful fallbacks.
+
+### Enabling AI
+
+1. Get an API key from https://aistudio.google.com/
+2. Add it to `.env` as `GEMINI_API_KEY=your_key`
+3. Restart the server
+
+Health endpoint (`/api/health`) now exposes:
+
+```json
+{
+  "status": "ok",
+  "ai": { "enabled": true }
+}
+```
+
+### AI Job Fit Endpoint
+
+```bash
+curl -X POST http://localhost:3000/api/insights/job-fit \
+   -H 'Content-Type: application/json' \
+   -d '{
+      "userSkills": ["JavaScript", "React", "Node.js"],
+      "jobSkills": ["React", "TypeScript", "GraphQL"],
+      "jobTitle": "Frontend Engineer",
+      "company": "Acme"
+   }'
+```
+
+Returns structured JSON:
+
+```json
+{
+   "meta": { ... },
+   "analysis": {
+      "summary": "...",
+      "strengths": ["..."],
+      "gaps": ["..."],
+      "prioritySkills": [{ "skill": "TypeScript", "impact": 0.9, "reason": "..." }],
+      "learningPlan": [{ "step": "TypeScript Deep Dive", "focus": "Generics", "rationale": "..." }],
+      "pitch": "Concise personal positioning statement"
+   }
+}
+```
+
+If AI is unavailable you will receive HTTP 503 with a helpful message.
+
+## 🖥️ Web Interface
 
 The application includes a simple web interface with the following sections:
 
@@ -193,6 +246,7 @@ The application includes a simple web interface with the following sections:
 - **Match**: Find job matches for a specific user using different algorithms
 - **Search**: Search for jobs using keywords
 - **Skills**: Get skill recommendations and find skill paths
+- **Insights**: Run AI job fit analyses (with mock sample if AI disabled)
 
 The UI allows you to:
 

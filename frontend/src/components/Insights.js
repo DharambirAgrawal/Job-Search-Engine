@@ -17,6 +17,8 @@ const Insights = () => {
   const [manualJobSkills, setManualJobSkills] = useState("");
   const [manualJobTitle, setManualJobTitle] = useState("");
   const [manualCompany, setManualCompany] = useState("");
+  const [aiUnavailable, setAiUnavailable] = useState(false);
+  const [showMock, setShowMock] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -61,7 +63,11 @@ const Insights = () => {
       const data = await api.getJobFit(payload);
       setAnalysis(data);
     } catch (error) {
-      showToast("Failed to generate analysis", "error");
+      if (error?.response?.status === 503) {
+        setAiUnavailable(true);
+      } else {
+        showToast("Failed to generate analysis", "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -72,6 +78,119 @@ const Insights = () => {
       <h2>AI Job Fit Insights</h2>
       <div className="card">
         <h3>Configure Analysis</h3>
+        {aiUnavailable && (
+          <div
+            className="warning"
+            style={{
+              background: "#fff4e5",
+              padding: "12px 14px",
+              border: "1px solid #f0c36d",
+              borderRadius: 6,
+              marginBottom: 16,
+              fontSize: 14,
+            }}
+          >
+            <strong>AI service unavailable.</strong> Set{" "}
+            <code>GEMINI_API_KEY</code> in your environment to enable real
+            analyses.
+            <div style={{ marginTop: 8 }}>
+              <button
+                type="button"
+                className="btn"
+                style={{ fontSize: 12, padding: "4px 10px" }}
+                onClick={() => setShowMock(true)}
+              >
+                Load mock sample
+              </button>
+            </div>
+          </div>
+        )}
+        {showMock && !analysis && (
+          <div style={{ marginBottom: 16 }}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                setAnalysis({
+                  meta: {
+                    userSkills: manualMode
+                      ? manualUserSkills
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean)
+                      : [],
+                    jobSkills: manualMode
+                      ? manualJobSkills
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean)
+                      : [],
+                    jobTitle: manualJobTitle || "Sample Role",
+                    company: manualCompany || "DemoCo",
+                    generatedAt: new Date().toISOString(),
+                  },
+                  analysis: {
+                    summary:
+                      "Candidate shows strong overlap in core frontend technologies with clear opportunities to deepen TypeScript and cloud deployment expertise.",
+                    strengths: [
+                      "Solid React ecosystem knowledge",
+                      "Backend exposure via Node.js enabling end-to-end perspective",
+                      "Understanding of component-driven architecture",
+                    ],
+                    gaps: [
+                      "Production-grade TypeScript patterns",
+                      "Cloud infrastructure (AWS basics)",
+                      "GraphQL schema design",
+                    ],
+                    prioritySkills: [
+                      {
+                        skill: "TypeScript",
+                        impact: 0.9,
+                        reason:
+                          "Improves robustness & hiring signal for modern frontend roles.",
+                      },
+                      {
+                        skill: "AWS Basics",
+                        impact: 0.6,
+                        reason:
+                          "Enables deployment & cross-team collaboration.",
+                      },
+                      {
+                        skill: "GraphQL",
+                        impact: 0.55,
+                        reason:
+                          "Common in modern frontend-backend integration layers.",
+                      },
+                    ],
+                    learningPlan: [
+                      {
+                        step: "TypeScript Deep Dive",
+                        focus: "Generics, utility types, strict configs",
+                        rationale: "Elevates code quality & reduces defects.",
+                      },
+                      {
+                        step: "GraphQL Fundamentals",
+                        focus: "Schema, queries, mutations",
+                        rationale: "Improves API collaboration & efficiency.",
+                      },
+                      {
+                        step: "AWS Foundations",
+                        focus: "S3, Lambda, CloudFront basics",
+                        rationale:
+                          "Supports deployment & architectural awareness.",
+                      },
+                    ],
+                    pitch:
+                      "Frontend engineer with strong React & JS foundation, now leveling up TypeScript and API design—ready to contribute end-to-end user-facing features with reliability.",
+                  },
+                });
+                setShowMock(false);
+              }}
+            >
+              Insert sample analysis
+            </button>
+          </div>
+        )}
         <form onSubmit={handleAnalyze}>
           <div className="form-group">
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>

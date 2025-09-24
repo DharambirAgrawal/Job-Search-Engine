@@ -30,6 +30,7 @@ function RouteTitle() {
       match: "Match - Job Search Engine",
       search: "Search - Job Search Engine",
       skills: "Skills - Job Search Engine",
+      insights: "AI Insights - Job Search Engine",
     };
     document.title = titleMap[path] || "Job Search Engine";
   }, [location]);
