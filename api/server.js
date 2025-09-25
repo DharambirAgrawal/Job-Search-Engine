@@ -16,6 +16,7 @@ const searchRoutes = require("./routes/search");
 const skillRoutes = require("./routes/skills");
 const healthRoutes = require("./routes/health");
 const insightsRoutes = require("./routes/insights");
+const advisorRoutes = require("./routes/advisor");
 
 // Initialize express app
 const app = express();
@@ -35,6 +36,7 @@ app.use("/api/search", searchRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/insights", insightsRoutes);
+app.use("/api/advisor", advisorRoutes);
 
 // API info route
 app.get("/api", (req, res) => {

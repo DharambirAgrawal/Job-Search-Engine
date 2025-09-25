@@ -195,4 +195,26 @@ export const api = {
       throw error;
     }
   },
+  // Advisor - Resume / Job Description Analysis
+  analyzeResume: async ({ file, jobId, jobDescription, useAI, resumeText }) => {
+    try {
+      const form = new FormData();
+      if (file) form.append("resume", file);
+      if (jobId) form.append("jobId", jobId);
+      if (jobDescription) form.append("jobDescription", jobDescription);
+      if (useAI !== undefined) form.append("useAI", useAI);
+      if (resumeText) form.append("resumeText", resumeText);
+      const response = await axios.post(
+        `${API_BASE_URL}/advisor/analyze`,
+        form,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error analyzing resume:", error);
+      throw error;
+    }
+  },
 };

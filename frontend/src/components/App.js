@@ -17,6 +17,7 @@ import Search from "./Search";
 import Skills from "./Skills";
 import Insights from "./Insights";
 import Toast from "./Toast";
+import Advisor from "./Advisor";
 
 function RouteTitle() {
   const location = useLocation();
@@ -172,6 +173,14 @@ function App() {
             >
               Insights
             </NavLink>
+            <NavLink
+              to="/advisor"
+              className={({ isActive }) =>
+                isActive ? "tab-btn active" : "tab-btn"
+              }
+            >
+              Advisor
+            </NavLink>
           </div>
         </nav>
 
@@ -197,6 +206,7 @@ function App() {
             <Route path="/search" element={<Search />} />
             <Route path="/skills" element={<Skills />} />
             <Route path="/insights" element={<Insights />} />
+            <Route path="/advisor" element={<Advisor />} />
           </Routes>
         </main>
 
